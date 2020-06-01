@@ -26,18 +26,32 @@ adc = Adafruit_ADS1x15.ADS1115() #.ADS1015 para elegir el otro
 #  -   8 = +/-0.512V
 #  -  16 = +/-0.256V
 # See table 3 in the ADS1015/ADS1115 datasheet for more info on gain.
-GAIN = 2/3
+GAIN = 1
 
 #ahora voy a configurar el DHT
+DHT_Sensor = Adafruit_DHT.DHT22 # le decimos q es un DHT22
+DHT_PIN = 17 # este es el pin de GPIO (es el 11 de pero a estos muchachos les gusta mezclar los numeros)
 
 
-print('Reading ADS1x15 values, press Ctrl-C to quit...')
+
+print('Reading ADS1x15 values')
 # Print nice channel column headers.
 print('| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*range(4)))
 print('-' * 37)
+sleepvalue = 2
 # Main loop.
 for veces in range(20):
-    
+
+    time.sleep(sleepvalue*2) #el DHT necesita tiempo para prepararse, se lo damos
+    humidity, temperature = Adafruit_DHT.read_retry(DHT_SENSOR, DHT_PIN) #controlar DHT_PIN
+    if humidity is not None and temperature is not None:
+        print("Temp={0:0.1f}*C  Humidity={1:0.1f}%".format(temperature, humidity))
+    else:
+        print("Failed to retrieve data from humidity sensor")
+
+# ------------------ terminado el DHT vamos a imprimir el ads ---------------------------
+ 
+        
     # Read all the ADC channel values in a list.
     values = [0]*4
     for i in range(4):
@@ -53,5 +67,5 @@ for veces in range(20):
     # Print the ADC values.
     print(str(veces)+'| {0:>6} | {1:>6} | {2:>6} | {3:>6} |'.format(*values))
     # Pause for half a second.
-    time.sleep(2)
+    time.sleep(sleepvalue)
     veces += 1
